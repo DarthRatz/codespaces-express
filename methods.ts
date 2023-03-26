@@ -1,8 +1,8 @@
 import * as _ from "lodash";
 
 export function arrayToHTMLList(array: string[]) {
-  const listItems = array.map(x => `<li>${x}</li>`) 
-  return `<ul>${listItems.join('')}</ul>`;
+  const listItems = array.map(x => `<li>${x}</li>`).join('') 
+  return `<ul>${listItems}</ul>`;
 }
 
 export function getObjectMethods(obj: any): string[] {

@@ -17,7 +17,12 @@ app.use(express.json())
 
 app.get("/s3", (req, res) => {
   const asList = req.query.asList === "true";
-  countMethodsByFirstWord(s3Methods)
+  const wordCount = req.query.wordCount === "true";
+
+  if (wordCount) {
+    res.send(countMethodsByFirstWord(s3Methods));
+    return;
+  }
   
   if (asList) {
     const returnList = arrayToHTMLList(s3Methods);
