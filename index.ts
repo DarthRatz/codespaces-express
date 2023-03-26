@@ -1,8 +1,8 @@
-import express from "express";
+import { S3 } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
-import { SageMaker } from "@aws-sdk/client-sagemaker";
-import * as _ from 'lodash'
-import { getObjectMethods, countMethodsByFirstWord, arrayToHTMLList, isValidCommand } from "./methods";
+import express from "express";
+import * as _ from 'lodash';
+import { arrayToHTMLList, countMethodsByFirstWord, getObjectMethods, isValidCommand } from "./methods";
 
 dotenv.config();
 
@@ -10,26 +10,26 @@ const app = express();
 const port = process.env.PORT || 3000;
 const region = process.env.REGION || "us-east-1";
 
-const sagemaker = new SageMaker({ region });
-const sagemakerMethods = getObjectMethods(sagemaker);
+const s3 = new S3({ region });
+const s3Methods = getObjectMethods(s3);
 
 app.use(express.json())
 
-app.get("/sagemaker", (req, res) => {
+app.get("/s3", (req, res) => {
   const asList = req.query.asList === "true";
-  countMethodsByFirstWord(sagemakerMethods)
+  countMethodsByFirstWord(s3Methods)
   
   if (asList) {
-    const returnList = arrayToHTMLList(sagemakerMethods);
+    const returnList = arrayToHTMLList(s3Methods);
     res.send(returnList);
     return;
   }
   
-  res.send(sagemakerMethods);
+  res.send(s3Methods);
 });
 
-app.get("/sagemaker/:functionName", (req, res) => {
-  const getMethods = sagemakerMethods.filter(
+app.get("/s3/:functionName", (req, res) => {
+  const getMethods = s3Methods.filter(
     (methodName) =>
       methodName.startsWith("get") ||
       methodName.startsWith("list") ||
@@ -44,7 +44,7 @@ app.get("/sagemaker/:functionName", (req, res) => {
   const params = _.merge({}, req.query, req.body);
   console.log(params);
 
-  sagemaker[FunctionName](params)
+  s3[FunctionName](params)
     .then((data: any) => {
       console.log(data);
       res.send(data);
@@ -55,8 +55,8 @@ app.get("/sagemaker/:functionName", (req, res) => {
     });
 });
 
-app.post("/sagemaker/:functionName", (req, res) => {
-  const postMethods = sagemakerMethods.filter(
+app.post("/s3/:functionName", (req, res) => {
+  const postMethods = s3Methods.filter(
     (methodName) =>
     methodName.startsWith("add") ||
       methodName.startsWith("create") ||
@@ -72,7 +72,7 @@ app.post("/sagemaker/:functionName", (req, res) => {
 
   console.log(params);
   
-  sagemaker[FunctionName](params)
+  s3[FunctionName](params)
     .then((data: any) => {
       console.log(data);
       res.send(data);
@@ -83,8 +83,8 @@ app.post("/sagemaker/:functionName", (req, res) => {
     });
 });
 
-app.delete("/sagemaker/:functionName", (req, res) => {
-  const deleteMethods = sagemakerMethods.filter(
+app.delete("/s3/:functionName", (req, res) => {
+  const deleteMethods = s3Methods.filter(
     (methodName) =>
       methodName.startsWith("delete") ||
       methodName.startsWith("remove")
@@ -97,7 +97,7 @@ app.delete("/sagemaker/:functionName", (req, res) => {
   const FunctionName = _.camelCase(req.params.functionName);
   const params = _.merge({}, req.query, req.body);
 
-  sagemaker[FunctionName](params)
+  s3[FunctionName](params)
     .then((data: any) => {
       console.log(data);
       res.send(data);
