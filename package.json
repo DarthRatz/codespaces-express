@@ -1,4 +1,11 @@
 {
+  "name": "codespaces-express",
+  "description": "Welcome to your shiny new Codespace running Express! We've got everything fired up and running for you to explore Express.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "build": "npx tsc",
     "start": "nodemon dist/index.js",
@@ -15,12 +22,5 @@
     "concurrently": "^7.6.0",
     "nodemon": "^2.0.22",
     "typescript": "^5.0.2"
-  },
-  "name": "codespaces-express",
-  "description": "Welcome to your shiny new Codespace running Express! We've got everything fired up and running for you to explore Express.",
-  "version": "1.0.0",
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

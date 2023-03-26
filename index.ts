@@ -27,6 +27,7 @@ app.get("/sagemaker/:functionName", (req, res) => {
 
   const FunctionName = req.params.functionName;
   const params = req.query;
+
   sagemaker[FunctionName](params)
     .then((data: any) => {
       console.log(data);
@@ -47,9 +48,8 @@ function getObjectMethods(obj: any): string[] {
   let currentObj = obj;
 
   while (currentObj) {
-    const objMethods = Object.getOwnPropertyNames(currentObj).filter(
-      (prop) => typeof currentObj[prop] === "function"
-    );
+    const objMethods = Object.getOwnPropertyNames(currentObj)
+      .filter((prop) => typeof currentObj[prop] === "function");
     methods = methods.concat(objMethods);
     currentObj = Object.getPrototypeOf(currentObj);
   }
