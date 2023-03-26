@@ -35,51 +35,48 @@ app.get("/s3/:functionName", (req, res) => {
       methodName.startsWith("list") ||
       methodName.startsWith("describe")
   );
-  if (!isValidCommand(getMethods, req.params.functionName)) {
+  if (!isValidCommand<S3>(req.params.functionName, getMethods)) {
     res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
     return;
   }
 
-  const FunctionName = _.camelCase(req.params.functionName);
+  const FunctionName = req.params.functionName;
   const params = _.merge({}, req.query, req.body);
-  console.log(params);
 
-  s3[FunctionName](params)
-    .then((data: any) => {
-      console.log(data);
+  (s3[FunctionName] as Function)(params)
+    .then((data: object) => {
+      console.log(FunctionName, data);
       res.send(data);
     })
-    .catch((error: any) => {
-      console.log(error);
-      res.status(400).send(error);
+    .catch((error: Error) => {
+      console.log(FunctionName, error);
+      res.status(400).send({ message: error.message });
     });
 });
 
 app.post("/s3/:functionName", (req, res) => {
   const postMethods = s3Methods.filter(
     (methodName) =>
-    methodName.startsWith("add") ||
+      methodName.startsWith("add") ||
       methodName.startsWith("create") ||
       methodName.startsWith("update")
   );
-  if (!isValidCommand(postMethods, req.params.functionName)) {
+  if (!isValidCommand<S3>(req.params.functionName, postMethods)) {
     res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
     return;
   }
 
-  const FunctionName = _.camelCase(req.params.functionName);
+  const FunctionName = req.params.functionName;
   const params = _.merge({}, req.query, req.body);
-
-  console.log(params);
   
-  s3[FunctionName](params)
-    .then((data: any) => {
+  (s3[FunctionName] as Function)(params)
+    .then((data: object) => {
       console.log(data);
       res.send(data);
     })
-    .catch((error: any) => {
-      console.log(error);
-      res.status(400).send(error);
+    .catch((error: Error) => {
+      console.log(FunctionName, error);
+      res.status(400).send({ message: error.message });
     });
 });
 
@@ -89,22 +86,22 @@ app.delete("/s3/:functionName", (req, res) => {
       methodName.startsWith("delete") ||
       methodName.startsWith("remove")
   );
-  if (!isValidCommand(deleteMethods, req.params.functionName)) {
+  if (!isValidCommand<S3>(req.params.functionName, deleteMethods)) {
     res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
     return;
   }
 
-  const FunctionName = _.camelCase(req.params.functionName);
+  const FunctionName = req.params.functionName;
   const params = _.merge({}, req.query, req.body);
 
-  s3[FunctionName](params)
-    .then((data: any) => {
+  (s3[FunctionName] as Function)(params)
+    .then((data: object) => {
       console.log(data);
       res.send(data);
     })
-    .catch((error: any) => {
-      console.log(error);
-      res.status(400).send(error);
+    .catch((error: Error) => {
+      console.log(FunctionName, error);
+      res.status(400).send({ message: error.message });
     });
 });
 

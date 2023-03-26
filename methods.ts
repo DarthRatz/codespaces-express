@@ -29,8 +29,8 @@ function getDefaultObjectMethods(): string[] {
   return Object.getOwnPropertyNames(defaultObj);
 }
 
-export function isValidCommand(methods: string[], commandName: string): boolean {
-  return methods.includes(commandName);
+export function isValidCommand<T>(methodName: string, methodList: unknown[]): methodName is Extract<keyof T, string> {
+  return methodList.includes(methodName as keyof T);
 }
 
 export function countMethodsByFirstWord(methods: string[]): Record<string, number> {
