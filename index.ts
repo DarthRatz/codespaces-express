@@ -1,10 +1,11 @@
 import { S3 } from "@aws-sdk/client-s3";
-import dotenv from "dotenv";
+import { config } from "dotenv";
 import express from "express";
-import * as _ from 'lodash';
+import { merge } from "lodash";
+
 import { arrayToHTMLList, countMethodsByFirstWord, getObjectMethods, isValidCommand } from "./methods";
 
-dotenv.config();
+config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,17 +21,15 @@ app.get("/s3", (req, res) => {
   const wordCount = req.query.wordCount === "true";
 
   if (wordCount) {
-    res.send(countMethodsByFirstWord(s3Methods));
-    return;
+    return res.send(countMethodsByFirstWord(s3Methods));
   }
   
   if (asList) {
     const returnList = arrayToHTMLList(s3Methods);
-    res.send(returnList);
-    return;
+    return res.send(returnList);
   }
   
-  res.send(s3Methods);
+  return res.send(s3Methods);
 });
 
 app.get("/s3/:functionName", (req, res) => {
@@ -39,23 +38,23 @@ app.get("/s3/:functionName", (req, res) => {
       methodName.startsWith("get") ||
       methodName.startsWith("list") ||
       methodName.startsWith("describe")
-  );
-  if (!isValidCommand<S3>(req.params.functionName, getMethods)) {
-    res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
-    return;
-  }
+    );
 
   const FunctionName = req.params.functionName;
-  const params = _.merge({}, req.query, req.body);
+  if (!isValidCommand<S3>(FunctionName, getMethods)) {
+    return res.status(404).send(`${FunctionName} is not a valid endpoint.`);
+  }
 
+  const params = merge({}, req.query, req.body);
+  
   (s3[FunctionName] as Function)(params)
     .then((data: object) => {
       console.log(FunctionName, data);
-      res.send(data);
+      return res.send(data);
     })
     .catch((error: Error) => {
       console.log(FunctionName, error);
-      res.status(400).send({ message: error.message });
+      return res.status(400).send({ message: error.message });
     });
 });
 
@@ -66,22 +65,22 @@ app.post("/s3/:functionName", (req, res) => {
       methodName.startsWith("create") ||
       methodName.startsWith("update")
   );
-  if (!isValidCommand<S3>(req.params.functionName, postMethods)) {
-    res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
-    return;
-  }
 
   const FunctionName = req.params.functionName;
-  const params = _.merge({}, req.query, req.body);
+  if (!isValidCommand<S3>(FunctionName, postMethods)) {
+    return res.status(404).send(`${FunctionName} is not a valid endpoint.`);
+  }
+
+  const params = merge({}, req.query, req.body);
   
   (s3[FunctionName] as Function)(params)
     .then((data: object) => {
       console.log(data);
-      res.send(data);
+      return res.send(data);
     })
     .catch((error: Error) => {
       console.log(FunctionName, error);
-      res.status(400).send({ message: error.message });
+      return res.status(400).send({ message: error.message });
     });
 });
 
@@ -91,22 +90,22 @@ app.delete("/s3/:functionName", (req, res) => {
       methodName.startsWith("delete") ||
       methodName.startsWith("remove")
   );
-  if (!isValidCommand<S3>(req.params.functionName, deleteMethods)) {
-    res.status(404).send(`${req.params.functionName} is not a valid endpoint.`);
-    return;
-  }
 
   const FunctionName = req.params.functionName;
-  const params = _.merge({}, req.query, req.body);
+  if (!isValidCommand<S3>(FunctionName, deleteMethods)) {
+    return res.status(404).send(`${FunctionName} is not a valid endpoint.`);
+  }
+
+  const params = merge({}, req.query, req.body);
 
   (s3[FunctionName] as Function)(params)
     .then((data: object) => {
       console.log(data);
-      res.send(data);
+      return res.send(data);
     })
     .catch((error: Error) => {
       console.log(FunctionName, error);
-      res.status(400).send({ message: error.message });
+      return res.status(400).send({ message: error.message });
     });
 });
 
