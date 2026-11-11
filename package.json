@@ -24,7 +24,7 @@
     "@types/lodash": "^4.14.191",
     "@types/node": "^18.15.10",
     "concurrently": "^8.0.0",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.0",
     "typescript": "^5.0.2"
   }
 }
